@@ -10,16 +10,9 @@ WORK_DIR = Path(os.getenv("WORK_DIR", PROJECT_ROOT / "work")).resolve()
 WORK_DIR.mkdir(parents=True, exist_ok=True)
 
 # ========= Local_Model 配置 =========
-VLLM_BASE_URL = "http://localhost:11434/api"
 VLLM_MODEL = str(Path(os.getenv("VLLM_MODEL", PROJECT_ROOT.parent / "models" / "Qwen3.5-4B")).resolve())
-VLLM_KEEP_ALIVE = "30m"
-VLLM_READ_BATCH_SIZE = 10000
-VLLM_RECORDS_PER_REQUEST = 16
-VLLM_MAX_IN_FLIGHT_BATCHES = 16
-VLLM_WRITE_BUFFER_SIZE = 1000
 VLLM_TEXT_MAX_CHARS = 600
 VLLM_MAX_OUTPUT_TOKENS_PER_ITEM = 48
-VLLM_OPTIONS = {}
 
 # 速度优先时建议关掉
 VLLM_RETURN_REASON = False

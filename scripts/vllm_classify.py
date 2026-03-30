@@ -8,7 +8,6 @@ import os
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any
 
 import pandas as pd
 from tqdm import tqdm
@@ -28,52 +27,9 @@ from config import (
     VLLM_RETURN_REASON,
     VLLM_TEXT_MAX_CHARS,
 )
+from utils import ensure_exists, load_done_ids_from_jsonl, safe_str, truncate_text
 from vllm import LLM, SamplingParams
 from vllm.sampling_params import StructuredOutputsParams
-
-
-def ensure_exists(path, msg: str | None = None):
-    p = Path(path)
-    if not p.exists():
-        raise FileNotFoundError(msg or f"文件不存在: {p}")
-
-
-def safe_str(x: Any) -> str:
-    if x is None:
-        return ""
-    s = str(x)
-    if s.lower() in {"nan", "<na>", "none"}:
-        return ""
-    return s
-
-
-def truncate_text(text: str, max_chars: int) -> str:
-    text = safe_str(text).strip()
-    if max_chars is None or max_chars <= 0:
-        return text
-    return text[:max_chars]
-
-
-def load_done_ids_from_jsonl(path) -> set[str]:
-    p = Path(path)
-    if not p.exists() or p.stat().st_size == 0:
-        return set()
-
-    done = set()
-    with p.open("r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                obj = json.loads(line)
-            except Exception:
-                continue
-            pid = safe_str(obj.get("photo_id")).strip()
-            if pid:
-                done.add(pid)
-    return done
-
 
 REJECT_LABEL = "拒绝"
 ALL_OUTPUT_LABELS = LABELS + [REJECT_LABEL]
