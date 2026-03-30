@@ -13,8 +13,8 @@ from typing import Any
 import pandas as pd
 from tqdm import tqdm
 
-# 强制把项目根目录放到 sys.path 最前面，避免导入到 site-packages 里的同名包
-PROJECT_ROOT = Path(os.getenv("PROJECT_ROOT", "/root/shared-nvme/Unsplash_Data"))
+# 默认使用当前脚本所在目录，避免重命名目录后导入失败
+PROJECT_ROOT = Path(os.getenv("PROJECT_ROOT", Path(__file__).resolve().parent))
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
@@ -78,10 +78,8 @@ def load_done_ids_from_jsonl(path) -> set[str]:
 REJECT_LABEL = "拒绝"
 ALL_OUTPUT_LABELS = LABELS + [REJECT_LABEL]
 
-# 指向服务器本地模型目录；如果没设环境变量，就回落到 config 中的 VLLM_MODEL
-# 推荐示例：
-# export VLLM_MODEL=/root/shared-nvme/models/Qwen3.5-4B
-VLLM_MODEL = os.getenv("VLLM_MODEL", VLLM_MODEL or "/root/shared-nvme/models/Qwen3.5-4B")
+# 指向服务器本地模型目录；
+VLLM_MODEL = os.getenv("VLLM_MODEL", VLLM_MODEL)
 VLLM_TENSOR_PARALLEL_SIZE = int(os.getenv("VLLM_TENSOR_PARALLEL_SIZE", "1"))
 VLLM_GPU_MEMORY_UTILIZATION = float(os.getenv("VLLM_GPU_MEMORY_UTILIZATION", "0.90"))
 VLLM_MAX_MODEL_LEN = int(os.getenv("VLLM_MAX_MODEL_LEN", "8192"))
@@ -389,7 +387,7 @@ def append_jsonl(records: list[dict], path: Path):
 
 
 def main() -> None:
-    ensure_exists(NEED_LLM_FILE, "请先运行 03_prepare_ai_only_need_llm.py")
+    ensure_exists(NEED_LLM_FILE, "请先运行 prepare_llm.py")
     VLLM_RESULTS_JSONL.parent.mkdir(parents=True, exist_ok=True)
 
     df = pd.read_parquet(NEED_LLM_FILE)

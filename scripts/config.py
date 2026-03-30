@@ -1,14 +1,17 @@
 from pathlib import Path
 
 # ========= 基本路径 =========
-# 改成你自己的 Unsplash 数据集目录
-DATA_ROOT = Path(r"Your_Dataset_Catalog").resolve()
-WORK_DIR = "./work"
+# 改成你自己的 Unsplash 数据集目录；也可通过环境变量 DATA_ROOT 覆盖
+import os
+
+PROJECT_ROOT = Path(__file__).resolve().parent
+DATA_ROOT = Path(os.getenv("DATA_ROOT", PROJECT_ROOT / "data")).resolve()
+WORK_DIR = Path(os.getenv("WORK_DIR", PROJECT_ROOT / "work")).resolve()
 WORK_DIR.mkdir(parents=True, exist_ok=True)
 
 # ========= Local_Model 配置 =========
 VLLM_BASE_URL = "http://localhost:11434/api"
-VLLM_MODEL = "./models/Qwen3.5-4B"   # 可改成你本机已经 pull 好的模型
+VLLM_MODEL = str(Path(os.getenv("VLLM_MODEL", PROJECT_ROOT.parent / "models" / "Qwen3.5-4B")).resolve())
 VLLM_KEEP_ALIVE = "30m"
 VLLM_READ_BATCH_SIZE = 10000
 VLLM_RECORDS_PER_REQUEST = 16
